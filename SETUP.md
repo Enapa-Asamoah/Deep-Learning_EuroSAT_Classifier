@@ -2,7 +2,7 @@
 
 This document provides a quick setup guide for the Deep Learning Research Projects repository.
 
-## 📋 Repository Overview
+##  Repository Overview
 
 This repository contains four independent research projects:
 
@@ -11,7 +11,7 @@ This repository contains four independent research projects:
 3. **MultiSense** - Multimodal emotion understanding
 4. **VisionXplain** - Interpretable Vision Transformers for medical imaging
 
-## 🚀 Initial Setup
+##  Initial Setup
 
 ### 1. Clone the Repository
 
@@ -54,7 +54,7 @@ cd visionxplain
 pip install -r requirements.txt
 ```
 
-## 📁 Project Structure
+##  Project Structure
 
 Each project follows a consistent structure:
 
@@ -74,7 +74,7 @@ project_name/
 └── requirements.txt  # Python dependencies
 ```
 
-## 🔧 Development Setup
+##  Development Setup
 
 ### 1. Install Development Tools
 
@@ -108,7 +108,7 @@ mkdir -p data/raw data/processed
 # Download EuroSAT or TrashNet dataset to data/raw/
 ```
 
-## 📝 Getting Started with a Project
+##  Getting Started with a Project
 
 1. **Read the Project README**: Start with `project_name/README.md`
 2. **Review Implementation Guide**: Check `project_name/IMPLEMENTATION.md`
@@ -127,7 +127,7 @@ pytest tests/
 pytest tests/ --cov=src --cov-report=html
 ```
 
-## 📊 Experiment Tracking
+##  Experiment Tracking
 
 - **Weights & Biases**: Projects use W&B for experiment tracking
 - **MLflow**: Alternative tracking system
@@ -156,11 +156,11 @@ mypy src/
 - API documentation can be generated using Sphinx
 - See `docs/` directory in each project for additional documentation
 
-## 🤝 Contributing
+##  Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 
-## ⚠️ Important Notes
+##  Important Notes
 
 - **Data Privacy**: For VisionXplain, ensure medical data handling complies with HIPAA/GDPR
 - **Reproducibility**: Always use fixed seeds for experiments
@@ -182,7 +182,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 - Review issue tracker
 - Contact project maintainers
 
-## 📄 License
+##  License
 
 See [LICENSE](LICENSE) for license information.
 

@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to this research repository! This document provides guidelines for contributing to the projects.
 
-## 📋 Project Structure
+## Project Structure
 
 This repository contains four independent research projects:
 - **LightVision**: Lightweight CNNs for image classification
@@ -12,7 +12,7 @@ This repository contains four independent research projects:
 
 Each project is managed independently. Please refer to the project-specific README and IMPLEMENTATION.md files for detailed information.
 
-## 🤝 How to Contribute
+## How to Contribute
 
 ### Reporting Issues
 
@@ -46,7 +46,7 @@ If you find a bug or have a suggestion:
    ```
 6. **Create a Pull Request** with a clear description of your changes
 
-## 📝 Code Style
+## Code Style
 
 - Follow PEP 8 for Python code
 - Use type hints where appropriate
@@ -54,21 +54,21 @@ If you find a bug or have a suggestion:
 - Keep functions focused and modular
 - Add comments for complex logic
 
-## 🧪 Testing
+## Testing
 
 - Write unit tests for new functionality
 - Ensure all existing tests pass
 - Aim for high test coverage
 - Test edge cases and error conditions
 
-## 📚 Documentation
+## Documentation
 
 - Update README.md if adding new features
 - Add docstrings to all functions and classes
 - Update IMPLEMENTATION.md if changing the workflow
 - Include examples in documentation
 
-## 🔬 Research Contributions
+## Research Contributions
 
 For research-related contributions:
 - Ensure reproducibility (fixed seeds, versioned datasets)
@@ -76,18 +76,18 @@ For research-related contributions:
 - Document experimental setup clearly
 - Provide ablation studies for major changes
 
-## ⚠️ Important Notes
+## Important Notes
 
 - **Medical Data**: For VisionXplain, ensure all medical data handling complies with HIPAA/GDPR
 - **Bias & Fairness**: For FairVoice, consider ethical implications of changes
 - **Reproducibility**: Maintain reproducibility standards (fixed seeds, versioned configs)
 - **Licensing**: Ensure any new dependencies are compatible with the project license
 
-## 📄 License
+## License
 
 By contributing, you agree that your contributions will be licensed under the same license as the project (MIT License).
 
-## 🙏 Recognition
+## Recognition
 
 Contributors will be recognized in:
 - Project README files

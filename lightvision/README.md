@@ -2,18 +2,18 @@
 
 ## Project Overview
 
-**LightVision** is a comprehensive research project that addresses the critical challenge of deploying accurate image classification models in low-resource environments. While modern deep learning models achieve state-of-the-art performance, they often require substantial computational resources that make them impractical for edge devices, mobile applications, or resource-constrained settings.
+**LightVision** is a research project that addresses the challenge of deploying accurate image classification models in low-resource environments. While modern deep learning models achieve good performance, they often require substantial computational resources that make them impractical for edge devices, mobile applications, or resource-constrained settings.
 
-This project pioneers an empirical, statistically rigorous comparison of model compression techniques—knowledge distillation (KD), quantization-aware training (QAT), and pruning—on realistic small-scale datasets. By evaluating these techniques individually and in combination, LightVision provides actionable insights for practitioners deploying vision models in production environments.
+This project compares model compression techniques—knowledge distillation (KD), quantization-aware training (QAT), and pruning—on realistic small-scale datasets. By evaluating these techniques individually and in combination, LightVision provides insights for practitioners deploying vision models in production environments.
 
 ## Key Innovations
 
-- **Comprehensive Compression Framework**: Unified evaluation of KD, QAT, and pruning techniques
-- **Empirical Rigor**: Statistically rigorous comparisons with multiple runs and significance testing
-- **Real-World Datasets**: Evaluation on EuroSAT (RGB) or TrashNet for practical relevance
-- **Hardware-Aware Benchmarking**: CPU latency, energy consumption, and model size measurements
-- **Deployment Artifacts**: Production-ready models for Raspberry Pi and Android devices
-- **Reproducibility-First**: Complete workflow with fixed seeds, versioned datasets, and detailed documentation
+- **Compression Framework**: Evaluation of KD, QAT, and pruning techniques
+- **Statistical Analysis**: Comparisons with multiple runs and significance testing
+- **Real-World Datasets**: Evaluation on EuroSAT (RGB) or TrashNet
+- **Hardware Benchmarking**: CPU latency, energy consumption, and model size measurements
+- **Deployment Support**: Models for Raspberry Pi and Android devices
+- **Reproducibility**: Complete workflow with fixed seeds, versioned datasets, and documentation
 
 ## Project Goals
 
@@ -192,13 +192,13 @@ This project contributes to the field through:
 
 ## Expected Deliverables
 
-- ✅ Trained teacher and student models (baseline and compressed)
-- ✅ Comprehensive comparison tables (accuracy, FLOPs, model size, latency, energy)
-- ✅ Statistical analysis with significance tests
-- ✅ Ablation studies on compression techniques
-- ✅ Deployment artifacts (ONNX, TFLite, PyTorch Mobile)
-- ✅ Publication-ready technical report (6-8 pages)
-- ✅ Reproducibility package (code, configs, dataset splits)
+-  Trained teacher and student models (baseline and compressed)
+-  Comprehensive comparison tables (accuracy, FLOPs, model size, latency, energy)
+-  Statistical analysis with significance tests
+-  Ablation studies on compression techniques
+-  Deployment artifacts (ONNX, TFLite, PyTorch Mobile)
+-  Publication-ready technical report (6-8 pages)
+-  Reproducibility package (code, configs, dataset splits)
 
 ## Publication Readiness
 

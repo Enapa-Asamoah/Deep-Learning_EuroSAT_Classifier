@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**FairVoice** is a groundbreaking research project that addresses critical ethical concerns in Speech Emotion Recognition (SER) systems. As SER technologies become increasingly deployed in healthcare, education, and customer support applications, evidence reveals that these systems often exhibit systematic biases across gender, accent, and ethnicity, leading to inconsistent and potentially unfair emotional predictions.
+**FairVoice** is a research project that addresses ethical concerns in Speech Emotion Recognition (SER) systems. As SER technologies become increasingly deployed in healthcare, education, and customer support applications, evidence reveals that these systems often exhibit systematic biases across gender, accent, and ethnicity, leading to inconsistent and potentially unfair emotional predictions.
 
 This project pioneers the development of fair, interpretable, and trustworthy emotion recognition models that not only achieve high accuracy but also behave equitably across diverse demographic groups. Through comprehensive bias assessment, advanced mitigation strategies, and explainability analysis, FairVoice contributes to building more ethical and transparent AI systems for speech processing.
 
@@ -124,11 +124,11 @@ This project contributes to the field through:
 
 ## Expected Deliverables
 
-- ✅ Trained baseline and fairness-aware models
-- ✅ Bias and fairness reports (tables + visualizations)
-- ✅ Explainability outputs (SHAP plots, spectrogram maps)
-- ✅ Full technical report or paper (6-8 pages)
-- ✅ Reproducibility package (scripts, configs, dataset splits)
+-  Trained baseline and fairness-aware models
+-  Bias and fairness reports (tables + visualizations)
+-  Explainability outputs (SHAP plots, spectrogram maps)
+-  Full technical report or paper (6-8 pages)
+-  Reproducibility package (scripts, configs, dataset splits)
 
 ## Contributing
 

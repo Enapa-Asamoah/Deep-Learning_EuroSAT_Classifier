@@ -1,10 +1,10 @@
 # FairVoice Implementation Guide
 
-## 🎯 Implementation Roadmap
+## Implementation Roadmap
 
 This document provides a detailed implementation guide for the FairVoice project, focusing on bias assessment, mitigation, and explainability in Speech Emotion Recognition.
 
-## Phase 1: Foundation & Baseline (Weeks 1-3)
+## Phase 1: Foundation & Baseline
 
 ### 1.1 Data Pipeline with Demographic Metadata
 
@@ -58,7 +58,7 @@ This document provides a detailed implementation guide for the FairVoice project
 - `src/evaluation/evaluator.py`
 - `scripts/training/train_baseline.py`
 
-## Phase 2: Bias Assessment (Weeks 4-5)
+## Phase 2: Bias Assessment
 
 ### 2.1 Bias Metrics Implementation
 
@@ -134,7 +134,7 @@ This document provides a detailed implementation guide for the FairVoice project
 - `src/evaluation/report_generator.py`
 - `scripts/bias_assessment/generate_report.py`
 
-## Phase 3: Bias Mitigation (Weeks 6-8)
+## Phase 3: Bias Mitigation
 
 ### 3.1 Data Balancing
 
@@ -214,7 +214,7 @@ This document provides a detailed implementation guide for the FairVoice project
 - `src/bias_mitigation/threshold_optimization.py`
 - `scripts/mitigation/post_process.py`
 
-## Phase 4: Explainability (Weeks 9-10)
+## Phase 4: Explainability
 
 ### 4.1 SHAP Analysis
 
@@ -282,7 +282,7 @@ This document provides a detailed implementation guide for the FairVoice project
 - `src/explainability/lime_audio.py`
 - `scripts/explainability/generate_lime.py`
 
-## Phase 5: Fairness-Accuracy Trade-off (Week 11)
+## Phase 5: Fairness-Accuracy Trade-off 
 
 ### 5.1 Trade-off Analysis
 
@@ -309,7 +309,7 @@ This document provides a detailed implementation guide for the FairVoice project
 - `notebooks/fairness_evaluation/tradeoff_analysis.ipynb`
 - `scripts/evaluation/analyze_tradeoffs.py`
 
-## Phase 6: Documentation & Paper (Week 12)
+## Phase 6: Documentation & Paper 
 
 ### 6.1 Reproducibility Package
 
@@ -342,7 +342,7 @@ This document provides a detailed implementation guide for the FairVoice project
 **Key Files**:
 - `docs/paper/main.tex` or `docs/paper/main.md`
 
-## 🔧 Technical Implementation Details
+##  Technical Implementation Details
 
 ### Bias Metrics
 
@@ -375,14 +375,14 @@ This document provides a detailed implementation guide for the FairVoice project
    - Fairness metrics
    - Statistical significance tests
 
-## 📊 Success Metrics
+##  Success Metrics
 
 - **Fairness**: Reduce demographic parity difference to < 0.05
 - **Accuracy**: Maintain >80% accuracy with fairness interventions
 - **Explainability**: Generate interpretable visualizations for all models
 - **Reproducibility**: All experiments reproducible with provided code
 
-## 🚀 Next Steps
+##  Next Steps
 
 1. Set up development environment
 2. Download datasets and extract metadata

@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**MultiSense** is a groundbreaking research project that advances emotion understanding beyond unimodal limitations by integrating visual, audio, and textual cues. While existing emotion recognition systems typically focus on a single modality, MultiSense pioneers a comprehensive multimodal framework that exploits cross-modal synergy and temporal dynamics to achieve superior emotion classification performance.
+**MultiSense** is a research project that advances emotion understanding beyond unimodal limitations by integrating visual, audio, and textual cues. While existing emotion recognition systems typically focus on a single modality, MultiSense pioneers a comprehensive multimodal framework that exploits cross-modal synergy and temporal dynamics to achieve superior emotion classification performance.
 
 This project develops and evaluates a suite of multimodal architectures, comparing unimodal, bimodal, and trimodal approaches across different fusion strategies. By providing a reproducible benchmark and contributing to open, explainable AI research, MultiSense addresses the critical need for more robust and interpretable emotion recognition systems.
 
@@ -172,14 +172,14 @@ This project contributes to the field through:
 
 ## Expected Deliverables
 
-- ✅ Trained unimodal, bimodal, and trimodal models
-- ✅ Comprehensive comparison tables (accuracy, F1-score, per-emotion metrics)
-- ✅ Fusion strategy analysis (early, late, hybrid)
-- ✅ Attention visualization and interpretability analysis
-- ✅ Statistical analysis with significance tests
-- ✅ Ablation studies on fusion components
-- ✅ Publication-ready technical report (6-8 pages)
-- ✅ Reproducibility package (code, configs, dataset splits)
+-  Trained unimodal, bimodal, and trimodal models
+-  Comprehensive comparison tables (accuracy, F1-score, per-emotion metrics)
+-  Fusion strategy analysis (early, late, hybrid)
+-  Attention visualization and interpretability analysis
+-  Statistical analysis with significance tests
+-  Ablation studies on fusion components
+-  Publication-ready technical report (6-8 pages)
+-  Reproducibility package (code, configs, dataset splits)
 
 ## Publication Readiness
 

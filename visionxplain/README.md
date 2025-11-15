@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**VisionXplain** is a pioneering research project that addresses the critical need for interpretable and trustworthy AI systems in medical imaging. While Vision Transformers (ViTs) have shown remarkable performance in medical image classification, their "black box" nature limits clinical adoption. This project develops an interpretable ViT-based framework that achieves high diagnostic accuracy while maintaining transparency and clinical trustworthiness through robust interpretability methods.
+**VisionXplain** is a research project that addresses the need for interpretable and trustworthy AI systems in medical imaging. While Vision Transformers (ViTs) have shown remarkable performance in medical image classification, their "black box" nature limits clinical adoption. This project develops an interpretable ViT-based framework that achieves high diagnostic accuracy while maintaining transparency and clinical trustworthiness through robust interpretability methods.
 
 By implementing and fine-tuning Vision Transformers and hybrid CNN-ViT architectures, and applying state-of-the-art explainability methods (Grad-CAM, Attention Rollout, Layer-wise Relevance Propagation), VisionXplain demonstrates that transformer-based models can be both accurate and interpretable for medical imaging applications.
 
@@ -168,7 +168,7 @@ python scripts/evaluation/evaluate_models.py \
 - **Image Size**: 512×512
 - **Challenge**: Small lesions, high resolution
 
-## 🔬 Research Contributions
+##  Research Contributions
 
 This project contributes to the field through:
 
@@ -181,14 +181,14 @@ This project contributes to the field through:
 
 ## Expected Deliverables
 
-- ✅ Trained ViT, hybrid, and baseline models
-- ✅ Comprehensive comparison tables (accuracy, sensitivity, specificity, AUC)
-- ✅ Interpretability visualizations (Grad-CAM, Attention, LRP)
-- ✅ Interpretability metrics (attention consistency, localization accuracy)
-- ✅ Statistical analysis with significance tests
-- ✅ Ablation studies on architecture and explainability methods
-- ✅ Publication-ready technical report (6-8 pages)
-- ✅ Reproducibility package (code, configs, dataset splits)
+-  Trained ViT, hybrid, and baseline models
+-  Comprehensive comparison tables (accuracy, sensitivity, specificity, AUC)
+-  Interpretability visualizations (Grad-CAM, Attention, LRP)
+-  Interpretability metrics (attention consistency, localization accuracy)
+-  Statistical analysis with significance tests
+-  Ablation studies on architecture and explainability methods
+-  Publication-ready technical report (6-8 pages)
+-  Reproducibility package (code, configs, dataset splits)
 
 ## Publication Readiness
 
