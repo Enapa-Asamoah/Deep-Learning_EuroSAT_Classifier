@@ -68,7 +68,9 @@ def build_teacher(num_classes):
 # Main Training Script
 # ================================
 def main(args):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # DirectML has poor performance due to CPU fallbacks, use CPU directly
+    device = torch.device("cpu")
+    print(f"Using device: {device}")
 
     # Load data
     train_loader, val_loader, num_classes = load_dataset(args.batch_size, num_workers=args.num_workers)

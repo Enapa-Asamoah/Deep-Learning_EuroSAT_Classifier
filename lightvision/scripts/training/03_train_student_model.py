@@ -25,7 +25,9 @@ if __name__ == '__main__':
     OUTPUT_DIR = 'outputs/models'
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # DirectML has poor performance, use CPU
+    device = torch.device('cpu')
+    print(f"Using device: {device}")
 
     # ================================
     # Load dataset splits

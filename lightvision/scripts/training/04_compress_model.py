@@ -27,7 +27,9 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 # ================================
 # Device
 # ================================
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# DirectML has poor performance, use CPU
+device = torch.device('cpu')
+print(f"Using device: {device}")
 
 # ================================
 # Dataset Loader
