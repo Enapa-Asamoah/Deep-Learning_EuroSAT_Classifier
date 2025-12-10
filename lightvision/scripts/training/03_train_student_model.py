@@ -1,86 +1,91 @@
 import os
 import sys
+import json
+import pickle
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, Subset
+from torchvision import models, transforms
+from torchvision.datasets import EuroSAT
 
-# Ensure the project root (the folder containing `src`) is on sys.path so
-# `from src...` imports work when running this script directly.
+# Ensure project root is on sys.path
 script_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(script_dir, '..', '..'))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader, Subset
-from torchvision import models
-import json
-
-from src.training.student_trainer import train_student
+from src.training.student_trainer import train_student  # your custom trainer
 
 if __name__ == '__main__':
-    # Directories
+    # ================================
+    # Directories and Device
+    # ================================
     RAW_DIR = 'data/raw'
     SPLITS_DIR = 'data/splits'
     OUTPUT_DIR = 'outputs/models'
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    # Device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    # Load split indices
+    # ================================
+    # Load dataset splits
+    # ================================
     with open(os.path.join(SPLITS_DIR, 'train_val_test_split_seed42.json'), 'r') as f:
         splits = json.load(f)
 
-    # Dataset
-    from torchvision.datasets import EuroSAT
-    from torchvision import transforms
+    # Use 224x224 for student too (match teacher / pretrained)
     transform = transforms.Compose([
-        transforms.Resize((64,64)),
+        transforms.Resize((224, 224)),
         transforms.ToTensor(),
-        transforms.Normalize(mean=[0.344,0.380,0.408], std=[0.180,0.166,0.160])
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
+
     full_dataset = EuroSAT(root=RAW_DIR, download=True, transform=transform)
     train_dataset = Subset(full_dataset, splits['train_indices'])
     val_dataset = Subset(full_dataset, splits['val_indices'])
 
-    # Dataloaders
-    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=0)
-    val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=0)
+    # Disable multiprocessing for Windows compatibility
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=8)
+    val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=8)
 
-    # Student architectures to train
-    student_architectures = {
-        'mobilenet_v2': models.mobilenet_v2(pretrained=True),
-        'mobilenet_v3': models.mobilenet_v3_small(pretrained=True),
-        'shufflenet_v2': models.shufflenet_v2_x1_0(pretrained=True)
-    }
 
-    for name, model in student_architectures.items():
-        # Modify classifier for EuroSAT
-        if hasattr(model, 'classifier'):
-            if isinstance(model.classifier, nn.Sequential):
-                in_features = model.classifier[-1].in_features
-                model.classifier[-1] = nn.Linear(in_features, len(full_dataset.classes))
-            else:
-                in_features = model.classifier.in_features
-                model.classifier = nn.Linear(in_features, len(full_dataset.classes))
-        elif hasattr(model, 'fc'):
-            in_features = model.fc.in_features
-            model.fc = nn.Linear(in_features, len(full_dataset.classes))
+    #Build student model (ResNet18)
+    student_name = 'student_resnet18'
+    student_model = models.resnet18(pretrained=True)
 
-        model = model.to(device)
+    
+    if hasattr(student_model, 'fc'):
+        in_features = student_model.fc.in_features
+        student_model.fc = nn.Linear(in_features, len(full_dataset.classes))
+    else:
+        student_model.classifier[-1] = nn.Linear(student_model.classifier[-1].in_features, len(full_dataset.classes))
 
-        # Training parameters
-        epochs = 10
-        learning_rate = 1e-4
-        weight_decay = 1e-4
+    student_model = student_model.to(device)
 
-        # Train student
-        trained_student, history = train_student(model, train_loader, val_loader, device,
-                                                epochs=epochs, lr=learning_rate, weight_decay=weight_decay,
-                                                save_path=os.path.join(OUTPUT_DIR, f'{name}.pth'))
+    # ================================
+    # Training parameters
+    # ================================
+    epochs = 10
+    learning_rate = 1e-4
+    weight_decay = 1e-4
 
-        # Save training history
-        import pickle
-        with open(os.path.join(OUTPUT_DIR, f'{name}_history.pkl'), 'wb') as f:
-            pickle.dump(history, f)
+    # ================================
+    # Train student
+    # ================================
+    trained_model, history = train_student(
+        model=student_model,
+        train_loader=train_loader,
+        val_loader=val_loader,
+        device=device,
+        epochs=epochs,
+        lr=learning_rate,
+        weight_decay=weight_decay,
+        save_path=os.path.join(OUTPUT_DIR, f'{student_name}.pth')
+    )
 
-        print(f"Student model {name} trained and saved.")
+    # Save training history
+    history_path = os.path.join(OUTPUT_DIR, f'{student_name}_history.pkl')
+    with open(history_path, 'wb') as f:
+        pickle.dump(history, f)
+
+    print(f"Student model {student_name} trained. Model and history saved to {OUTPUT_DIR}.")

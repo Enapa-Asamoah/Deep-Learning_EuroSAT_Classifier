@@ -1,0 +1,37 @@
+{
+    "teacher_resnet50": {
+        "checkpoint": "outputs/models\\teacher_resnet50.pth",
+        "accuracy": 0.13382716049382717,
+        "loss": 7.24716471142239,
+        "latency_ms": 98.41351985931396,
+        "size_mb": 90.056
+    },
+    "student_resnet18": {
+        "checkpoint": "outputs/models\\student_resnet18.pth",
+        "accuracy": 0.9792592592592593,
+        "loss": 0.06883055331898325,
+        "latency_ms": 63.76749515533447,
+        "size_mb": 42.73
+    },
+    "pruned_model": {
+        "checkpoint": "outputs/models\\pruned_model.pth",
+        "accuracy": 0.18345679012345678,
+        "loss": 5.563227536943224,
+        "latency_ms": 170.40871620178223,
+        "size_mb": 90.055
+    },
+    "distilled_model": {
+        "checkpoint": "outputs/models\\distilled_model.pth",
+        "accuracy": 0.12,
+        "loss": 4.010811911100223,
+        "latency_ms": 75.08163452148438,
+        "size_mb": 42.729
+    },
+    "qat_model": {
+        "checkpoint": "outputs/models\\quantized_model.pth",
+        "accuracy": 0.12296296296296297,
+        "loss": 4.494502768575409,
+        "latency_ms": 52.10684776306152,
+        "size_mb": 42.729
+    }
+}

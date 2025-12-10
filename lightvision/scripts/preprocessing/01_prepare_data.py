@@ -1,53 +1,64 @@
 import os
-# Workaround for OpenMP runtime conflicts on Windows when multiple OpenMP
-# runtimes are present (libomp.dll vs libiomp5md.dll). This allows the
-# process to continue. This is an unsafe, temporary workaround — see
-# recommendations below for long-term fixes.
-os.environ.setdefault('KMP_DUPLICATE_LIB_OK', 'TRUE')
-# Reduce thread contention while running preprocessing
-os.environ.setdefault('OMP_NUM_THREADS', '1')
-
 import json
 import torch
+from sklearn.model_selection import train_test_split
 from torchvision.datasets import EuroSAT
-from torchvision import transforms
-from torch.utils.data import random_split
 
+# ================================
 # Directories
+# ================================
 RAW_DIR = 'data/raw'
-PROCESSED_DIR = 'data/processed'
 SPLITS_DIR = 'data/splits'
 
-os.makedirs(PROCESSED_DIR, exist_ok=True)
 os.makedirs(SPLITS_DIR, exist_ok=True)
 
-# Transformations
-transform = transforms.Compose([
-    transforms.Resize((64, 64)),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.344, 0.380, 0.408], std=[0.180, 0.166, 0.160])  # EuroSAT RGB stats
-])
+# ================================
+# Load dataset WITHOUT transforms
+# (to avoid data leakage)
+# ================================
+print("Downloading EuroSAT dataset (no transforms applied)...")
+dataset = EuroSAT(root=RAW_DIR, download=True)
 
-# Download EuroSAT RGB dataset
-dataset = EuroSAT(root=RAW_DIR, download=True, transform=transform)
+num_samples = len(dataset)
+print(f"Total samples: {num_samples}")
 
-# Train/val/test split (70/15/15)
-train_size = int(0.7 * len(dataset))
-val_size = int(0.15 * len(dataset))
-test_size = len(dataset) - train_size - val_size
+# ================================
+# Extract labels for stratified split
+# ================================
+labels = [dataset[i][1] for i in range(num_samples)]
 
-torch.manual_seed(42)  # for reproducibility
-train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
+# ================================
+# Stratified 70/15/15 split
+# ================================
+train_indices, temp_indices, train_labels, temp_labels = train_test_split(
+    list(range(num_samples)),
+    labels,
+    test_size=0.30,
+    stratify=labels,
+    random_state=42
+)
 
-# Save split indices
+val_indices, test_indices = train_test_split(
+    temp_indices,
+    test_size=0.50,   # split 15/15
+    stratify=temp_labels,
+    random_state=42
+)
+
+print(f"Train: {len(train_indices)}, Val: {len(val_indices)}, Test: {len(test_indices)}")
+
+# ================================
+# Save splits
+# ================================
 splits = {
-    'train_indices': train_dataset.indices,
-    'val_indices': val_dataset.indices,
-    'test_indices': test_dataset.indices
+    'train_indices': train_indices,
+    'val_indices': val_indices,
+    'test_indices': test_indices
 }
 
-with open(os.path.join(SPLITS_DIR, 'train_val_test_split_seed42.json'), 'w') as f:
-    json.dump(splits, f)
+output_path = os.path.join(SPLITS_DIR, 'train_val_test_split_seed42.json')
 
-print(f"Dataset prepared and splits saved to {SPLITS_DIR}")
-print(f"Train: {len(train_dataset)}, Val: {len(val_dataset)}, Test: {len(test_dataset)}")
+with open(output_path, 'w') as f:
+    json.dump(splits, f, indent=4)
+
+print(f"Saved split file to {output_path}")

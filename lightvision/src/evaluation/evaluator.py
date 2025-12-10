@@ -1,110 +1,78 @@
 import os
 import torch
-from torch.utils.data import DataLoader
-from torchvision import transforms, datasets
-
-from src.evaluation.evaluator import evaluate_model
-from src.models.model_builder import build_model  # assuming you have this
-from src.utils.device import get_device  # helper that returns "cuda" or "cpu"
-
-DATA_DIR = "data/processed"          # processed EuroSAT data
-MODEL_DIR = "outputs/models"         # where teacher/student/etc. are saved
-PLOTS_DIR = "outputs/plots"
-REPORTS_DIR = "outputs/reports"
-
-BATCH_SIZE = 32
-NUM_CLASSES = 10  # EuroSAT RGB = 10 classes
+import torch.nn as nn
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support, classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
 
 
-def load_dataset():
-    """Loads the EuroSAT test set"""
-    transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-    ])
-
-    test_path = os.path.join(DATA_DIR, "test")
-
-    test_dataset = datasets.ImageFolder(root=test_path, transform=transform)
-    test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
-
-    class_names = test_dataset.classes
-    print(f"[✓] Loaded test dataset with {len(test_dataset)} samples.")
-
-    return test_loader, class_names
-
-
-def load_model(model_path):
-    """Loads a model from disk with correct architecture."""
-    if not os.path.exists(model_path):
-        print(f"[!] Model not found: {model_path}")
-        return None
-
-    # Infer model type from filename
-    if "teacher" in model_path:
-        model_type = "teacher"
-    elif "student" in model_path:
-        model_type = "student"
-    elif "distilled" in model_path:
-        model_type = "student"
-    else:
-        model_type = "student"
-
-    print(f"[✓] Loading {model_type} model → {model_path}")
-
-    model = build_model(model_type=model_type, num_classes=NUM_CLASSES)
-    model.load_state_dict(torch.load(model_path, map_location="cpu"))
-    model.to(get_device())
-
-    return model
-
-
-def evaluate_all_models():
-    device = get_device()
-    print(f"\n[✓] Using device: {device}")
-
-    # 1) Load dataset
-    test_loader, class_names = load_dataset()
-
-    # 2) List all models in outputs/models
-    model_files = [f for f in os.listdir(MODEL_DIR) if f.endswith(".pth")]
-
-    if len(model_files) == 0:
-        print("[!] No models found in outputs/models/")
-        return
-
-    print("\n[✓] Found models:")
-    for f in model_files:
-        print("   →", f)
-
-    # 3) Evaluate each model
-    for model_file in model_files:
-        model_path = os.path.join(MODEL_DIR, model_file)
-        model = load_model(model_path)
-
-        if model is None:
-            continue
-
-        model_name = os.path.splitext(model_file)[0]
-
-        print(f"\n[✓] Evaluating {model_name}...")
-
-        metrics, y_true, y_pred, plot_paths = evaluate_model(
-            model=model,
-            data_loader=test_loader,
-            device=device,
-            classes=class_names,
-            history=None,              # could load from saved histories if needed
-            plots_dir=PLOTS_DIR,
-            reports_dir=REPORTS_DIR,
-            model_name=model_name
-        )
-
-        print(f"[✓] Done evaluating {model_name}.")
-        print(f"    Accuracy: {metrics['accuracy']:.4f}")
-        print(f"    F1 Score: {metrics['f1_score']:.4f}")
-        print(f"    Saved results to outputs/reports and outputs/plots.\n")
-
-
-if __name__ == "__main__":
-    evaluate_all_models()
+def evaluate_model(model, data_loader, device, classes, history=None, output_dir="outputs/plots", model_name="model"):
+    """
+    Evaluate a trained model on test data.
+    
+    Args:
+        model: PyTorch model to evaluate
+        data_loader: DataLoader for test data
+        device: torch device
+        classes: list of class names
+        history: optional training history dict
+        output_dir: directory to save plots
+        model_name: name for saving plots
+        
+    Returns:
+        metrics: dict with accuracy, precision, recall, f1
+        y_true: ground truth labels
+        y_pred: predicted labels
+        plot_paths: dict with paths to saved plots
+    """
+    model.eval()
+    y_true = []
+    y_pred = []
+    
+    with torch.no_grad():
+        for images, labels in data_loader:
+            images, labels = images.to(device), labels.to(device)
+            outputs = model(images)
+            _, predicted = torch.max(outputs, 1)
+            
+            y_true.extend(labels.cpu().numpy())
+            y_pred.extend(predicted.cpu().numpy())
+    
+    # Calculate metrics
+    accuracy = accuracy_score(y_true, y_pred)
+    precision, recall, f1, _ = precision_recall_fscore_support(y_true, y_pred, average='weighted', zero_division=0)
+    
+    metrics = {
+        'accuracy': float(accuracy),
+        'precision': float(precision),
+        'recall': float(recall),
+        'f1_score': float(f1),
+        'classification_report': classification_report(y_true, y_pred, target_names=classes, zero_division=0)
+    }
+    
+    # Save confusion matrix
+    os.makedirs(output_dir, exist_ok=True)
+    cm = confusion_matrix(y_true, y_pred)
+    
+    plt.figure(figsize=(12, 10))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=classes, yticklabels=classes)
+    plt.title(f'Confusion Matrix - {model_name}')
+    plt.ylabel('True Label')
+    plt.xlabel('Predicted Label')
+    plt.tight_layout()
+    
+    cm_path = os.path.join(output_dir, f'{model_name}_confusion_matrix.png')
+    plt.savefig(cm_path)
+    plt.close()
+    
+    plot_paths = {'confusion_matrix': cm_path}
+    
+    print(f"\nEvaluation Results for {model_name}:")
+    print(f"Accuracy: {accuracy:.4f}")
+    print(f"Precision: {precision:.4f}")
+    print(f"Recall: {recall:.4f}")
+    print(f"F1 Score: {f1:.4f}")
+    print(f"\nConfusion matrix saved to: {cm_path}")
+    
+    return metrics, y_true, y_pred, plot_paths
