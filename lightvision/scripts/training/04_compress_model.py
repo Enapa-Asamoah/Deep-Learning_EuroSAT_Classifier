@@ -49,9 +49,10 @@ def load_dataset(batch_size=32):
     train_dataset = Subset(full_dataset, splits['train_indices'])
     val_dataset = Subset(full_dataset, splits['val_indices'])
 
-    num_workers = min(8, (os.cpu_count() or 1))
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
+    # Windows compatibility: disable multiprocessing
+    num_workers = 0
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=False)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=False)
 
     return train_loader, val_loader, len(full_dataset.classes)
 

@@ -1,0 +1,80 @@
+{
+  "distilled_model.pth": {
+    "architecture": "resnet18",
+    "layer": "conv1.weight",
+    "mean": -0.00013885718362871557,
+    "std": 0.12848339974880219,
+    "min": -0.8375368118286133,
+    "max": 1.0112205743789673,
+    "random_baseline_mean": -0.00012324836279731244,
+    "random_baseline_std": 0.02526937425136566,
+    "mean_diff_from_random": 1.5608820831403136e-05,
+    "std_diff_from_random": 0.10321402549743652,
+    "likely_trained": false
+  },
+  "pruned_model.pth": {
+    "architecture": "resnet50",
+    "layer": "conv1.weight",
+    "mean": -0.00039273410220630467,
+    "std": 0.025980373844504356,
+    "min": -0.12088113278150558,
+    "max": 0.09485223889350891,
+    "random_baseline_mean": -0.00015134990098886192,
+    "random_baseline_std": 0.025120534002780914,
+    "mean_diff_from_random": 0.00024138420121744275,
+    "std_diff_from_random": 0.0008598398417234421,
+    "likely_trained": false
+  },
+  "quantized_model.pth": {
+    "architecture": "resnet18",
+    "layer": "conv1.weight",
+    "mean": -9.778935054782778e-05,
+    "std": 0.1294373869895935,
+    "min": -0.8420071005821228,
+    "max": 1.0158218145370483,
+    "random_baseline_mean": -0.00012324836279731244,
+    "random_baseline_std": 0.02526937425136566,
+    "mean_diff_from_random": 2.5459012249484658e-05,
+    "std_diff_from_random": 0.10416801273822784,
+    "likely_trained": false
+  },
+  "resnet18.pth": {
+    "architecture": "resnet18",
+    "layer": "conv1.weight",
+    "mean": -0.00015615207666996866,
+    "std": 0.12955564260482788,
+    "min": -0.8435371518135071,
+    "max": 1.016143560409546,
+    "random_baseline_mean": -0.00012324836279731244,
+    "random_baseline_std": 0.02526937425136566,
+    "mean_diff_from_random": 3.2903713872656226e-05,
+    "std_diff_from_random": 0.10428626835346222,
+    "likely_trained": false
+  },
+  "student_resnet18.pth": {
+    "architecture": "resnet18",
+    "layer": "conv1.weight",
+    "mean": 0.0004930809373036027,
+    "std": 0.129459947347641,
+    "min": -0.8428376317024231,
+    "max": 1.0141141414642334,
+    "random_baseline_mean": -0.00012324836279731244,
+    "random_baseline_std": 0.02526937425136566,
+    "mean_diff_from_random": 0.0006163293001009151,
+    "std_diff_from_random": 0.10419057309627533,
+    "likely_trained": false
+  },
+  "teacher_resnet50.pth": {
+    "architecture": "resnet50",
+    "layer": "conv1.weight",
+    "mean": -0.00042748989653773606,
+    "std": 0.025979168713092804,
+    "min": -0.12081391364336014,
+    "max": 0.09474025666713715,
+    "random_baseline_mean": -0.00015134990098886192,
+    "random_baseline_std": 0.025120534002780914,
+    "mean_diff_from_random": 0.00027613999554887414,
+    "std_diff_from_random": 0.0008586347103118896,
+    "likely_trained": false
+  }
+}

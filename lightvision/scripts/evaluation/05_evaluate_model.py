@@ -130,14 +130,16 @@ def load_checkpoint(model_name, ckpt_path, num_classes):
 # Evaluation function
 # ================================
 def evaluate(model, dataloader):
-    model.eval()
-    criterion = nn.CrossEntropyLoss()
-
-    total_loss = 0
-    total_correct = 0
-    total = 0
-
+    model.eval()  # Ensure eval mode
+    
+    # Disable gradient computation and BatchNorm training
     with torch.no_grad():
+        criterion = nn.CrossEntropyLoss()
+
+        total_loss = 0
+        total_correct = 0
+        total = 0
+
         for img, label in dataloader:
             img, label = img.to(device), label.to(device)
             out = model(img)

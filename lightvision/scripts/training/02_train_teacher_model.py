@@ -46,11 +46,11 @@ def load_dataset(batch_size=64, num_workers=None):
     train_set = Subset(full_dataset, splits["train_indices"])
     val_set = Subset(full_dataset, splits["val_indices"])
 
-    if num_workers is None:
-        num_workers = min(8, (os.cpu_count() or 1))
+    # Windows compatibility: use 0 workers to avoid multiprocessing issues
+    num_workers = 0
 
-    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True)
-    val_loader = DataLoader(val_set, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
+    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=False)
+    val_loader = DataLoader(val_set, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=False)
 
     return train_loader, val_loader, len(full_dataset.classes)
 
@@ -108,7 +108,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train Teacher (ResNet-50) on EuroSAT")
 
     parser.add_argument("--batch_size", type=int, default=32)
-    parser.add_argument("--num_workers", type=int, default=min(8, (os.cpu_count() or 1)))
+    parser.add_argument("--num_workers", type=int, default=0)  # Windows compatibility
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--lr", type=float, default=1e-4)
     parser.add_argument("--weight_decay", type=float, default=1e-4)

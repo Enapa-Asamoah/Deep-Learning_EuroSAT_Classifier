@@ -45,8 +45,8 @@ if __name__ == '__main__':
     val_dataset = Subset(full_dataset, splits['val_indices'])
 
     # Disable multiprocessing for Windows compatibility
-    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=8)
-    val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=8)
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=0, pin_memory=False)
+    val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=0, pin_memory=False)
 
 
     #Build student model (ResNet18)
