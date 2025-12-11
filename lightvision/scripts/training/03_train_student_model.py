@@ -27,7 +27,7 @@ if __name__ == '__main__':
     os.makedirs(LOGS_DIR, exist_ok=True)
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu')
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # ================================
     # Load dataset splits

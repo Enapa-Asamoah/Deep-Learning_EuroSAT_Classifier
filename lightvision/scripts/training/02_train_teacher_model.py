@@ -68,7 +68,7 @@ def build_teacher(num_classes):
 # Main Training Script
 # ================================
 def main(args):
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Load data
     train_loader, val_loader, num_classes = load_dataset(args.batch_size, num_workers=args.num_workers)

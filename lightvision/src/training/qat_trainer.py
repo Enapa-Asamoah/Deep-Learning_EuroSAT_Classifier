@@ -7,25 +7,18 @@ from torch.quantization import get_default_qat_qconfig, prepare_qat, convert, fu
 def train_qat(model, train_loader, val_loader, device,
               epochs=10, lr=1e-5, weight_decay=1e-4, save_path=None):
     """
-    Quantization-Aware Training (QAT) pipeline for student model.
+    Train a student model with Quantization-Aware Training (QAT)
+    Args:
+        model: PyTorch model
+        train_loader, val_loader: DataLoaders
+        device: 'cuda' or 'cpu'
+        epochs: Number of epochs for fine-tuning
+        lr: Learning rate
+        weight_decay: Weight decay
+        save_path: Path to save best model
+    Returns:
+        trained model and history dictionary
     """
-    model.to(device)
-
-    # Step 1: Fuse layers (Conv + BN + ReLU)
-    # Fusion requires eval mode, but prepare_qat requires training mode
-    # So we fuse first, then set to training
-    model.eval()
-    if isinstance(model, nn.Module):
-        # Example: for ResNet
-        for module_name, module in model.named_children():
-            if module_name == "conv1":
-                model = fuse_modules(model, ['conv1', 'bn1', 'relu'], inplace=True)
-    
-    model.train()
-
-    # Step 2: Set QAT config
-    model.qconfig = get_default_qat_qconfig('fbgemm')
-    model_prepared = prepare_qat(model, inplace=True)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model_prepared.parameters(), lr=lr, weight_decay=weight_decay)
