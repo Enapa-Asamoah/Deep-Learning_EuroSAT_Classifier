@@ -2,31 +2,40 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
+import torch.nn.utils.prune as prune
 
-def train_pruning(model, train_loader, val_loader, device, epochs=10, lr=1e-5, weight_decay=1e-4, save_path=None):
+def train_pruning(model, train_loader, val_loader, device,
+                  epochs=10, lr=1e-5, weight_decay=1e-4, prune_amount=0.3, save_path=None):
     """
-    Train a pruned model with fine-tuning
+    Apply pruning to Conv2d and Linear layers, then fine-tune.
+    
     Args:
-        model: PyTorch model (pruned)
+        model: PyTorch model
         train_loader, val_loader: DataLoaders
         device: 'cuda' or 'cpu'
         epochs: Number of fine-tuning epochs
         lr: Learning rate
         weight_decay: Weight decay
+        prune_amount: Fraction of weights to prune
         save_path: Path to save best model
     Returns:
-        trained model and history dictionary
+        pruned & fine-tuned model, training history
     """
+    model.to(device)
+    
+    # Step 1: Apply pruning
+    for module in model.modules():
+        if isinstance(module, nn.Conv2d) or isinstance(module, nn.Linear):
+            prune.l1_unstructured(module, name='weight', amount=prune_amount)
+            prune.remove(module, 'weight')  # make pruning permanent
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
-
     history = {'train_loss': [], 'train_acc': [], 'val_loss': [], 'val_acc': []}
     best_acc = 0.0
 
-    model.train()
-
     for epoch in range(epochs):
+        model.train()
         running_loss = 0.0
         correct = 0
         total = 0
@@ -64,19 +73,17 @@ def train_pruning(model, train_loader, val_loader, device, epochs=10, lr=1e-5, w
         val_loss /= val_total
         val_acc = val_correct / val_total
 
-        # Save epoch history
         history['train_loss'].append(train_loss)
         history['train_acc'].append(train_acc)
         history['val_loss'].append(val_loss)
         history['val_acc'].append(val_acc)
 
-        print(f"Epoch {epoch+1}: Train Loss={train_loss:.4f}, Train Acc={train_acc:.4f}, Val Loss={val_loss:.4f}, Val Acc={val_acc:.4f}")
+        print(f"Epoch {epoch+1}: Train Loss={train_loss:.4f}, Train Acc={train_acc:.4f}, "
+              f"Val Loss={val_loss:.4f}, Val Acc={val_acc:.4f}")
 
         if save_path and val_acc > best_acc:
             torch.save(model.state_dict(), save_path)
             print(f"Saved best pruned model with accuracy {val_acc:.4f}")
             best_acc = val_acc
-
-        model.train()
 
     return model, history

@@ -96,72 +96,43 @@ pip install -r requirements.txt
 1. Download dataset (EuroSAT RGB or TrashNet)
 2. Run preprocessing pipeline:
 ```bash
-python scripts/preprocessing/prepare_data.py \
-    --dataset eurosat \
-    --data_dir data/raw \
-    --output_dir data/processed \
-    --split_seed 42
+python scripts/preprocessing/01_prepare_data.py
 ```
 
 ### Training Baseline Teacher Model
 
 ```bash
-python scripts/training/train_baseline.py \
-    --config configs/baseline_config.yaml \
-    --model_type teacher \
-    --seed 42
+python scripts/training/02_train_teacher_model.py \
+  --epochs 20 \
+  --batch_size 32 \
+  --lr 0.001
 ```
 
 ### Training Student Models
 
 ```bash
 # Lightweight student model
-python scripts/training/train_baseline.py \
-    --config configs/baseline_config.yaml \
-    --model_type student \
-    --seed 42
+python scripts/training/03_train_student_model.py \
+  --epochs 20 \
+  --batch_size 32 \
+  --lr 0.001
 ```
 
 ### Model Compression
 
 ```bash
-# Knowledge Distillation
-python scripts/training/train_distilled.py \
-    --config configs/distillation_config.yaml \
-    --teacher_path outputs/models/teacher_best.pth \
-    --seed 42
-
-# Quantization-Aware Training
-python scripts/training/train_qat.py \
-    --config configs/qat_config.yaml \
-    --model_path outputs/models/student_best.pth \
-    --seed 42
-
-# Pruning
-python scripts/training/train_pruned.py \
-    --config configs/pruning_config.yaml \
-    --model_path outputs/models/student_best.pth \
-    --seed 42
-
-# Combined Pipeline
-python scripts/training/train_combined.py \
-    --config configs/combined_config.yaml \
-    --seed 42
+# Knowledge Distillation, Pruning and Quantization
+python scripts/training/04_compress_model.py \
+  --student_arch student_resnet18 \
+  --student_checkpoint outputs/models/student_resnet18.pth \
+  --methods distillation pruning qat
 ```
 
 ### Evaluation and Benchmarking
 
 ```bash
 # Comprehensive evaluation
-python scripts/evaluation/benchmark.py \
-    --model_dir outputs/models \
-    --test_data data/processed/test \
-    --output_dir outputs/reports
-
-# Hardware-specific benchmarking
-python scripts/evaluation/benchmark_hardware.py \
-    --model_path outputs/models/compressed_model.pth \
-    --device raspberry_pi
+python scripts/evaluation/05_evaluate_model.py
 ```
 
 ## Datasets

@@ -23,9 +23,11 @@ if __name__ == '__main__':
     RAW_DIR = 'data/raw'
     SPLITS_DIR = 'data/splits'
     OUTPUT_DIR = 'outputs/models'
+    LOGS_DIR = 'outputs/logs'
+    os.makedirs(LOGS_DIR, exist_ok=True)
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu')
 
     # ================================
     # Load dataset splits
@@ -84,7 +86,7 @@ if __name__ == '__main__':
     )
 
     # Save training history
-    history_path = os.path.join(OUTPUT_DIR, f'{student_name}_history.pkl')
+    history_path = os.path.join(LOGS_DIR, f'{student_name}_history.pkl')
     with open(history_path, 'wb') as f:
         pickle.dump(history, f)
 

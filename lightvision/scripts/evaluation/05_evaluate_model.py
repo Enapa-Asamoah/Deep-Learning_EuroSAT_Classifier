@@ -27,7 +27,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 os.makedirs(PLOTS_DIR, exist_ok=True)
 os.makedirs(REPORTS_DIR, exist_ok=True)
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu')
 
 # ================================
 # Preprocessing config
@@ -55,76 +55,139 @@ def load_dataset(batch_size=32, num_workers=4):
     with open(split_path, 'r') as f:
         splits = json.load(f)
 
-    val_dataset = Subset(full_dataset, splits['val_indices'])
-    val_loader = DataLoader(
-        val_dataset,
+    test_dataset = Subset(full_dataset, splits['test_indices'])
+    test_loader = DataLoader(
+        test_dataset,
         batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers,
-        pin_memory=(device.type == 'cuda')
+        pin_memory=(device.type == 'mps')
     )
-    return val_loader, len(full_dataset.classes)
+    return test_loader, len(full_dataset.classes)
 
 # ================================
-# Model factory
+# Model factory helpers
 # ================================
-def build_model(name, num_classes):
-    name = name.lower()
+def _build_model_from_arch(arch, num_classes):
+    arch = arch.lower()
 
-    # Teacher is ResNet50
-    if "teacher" in name:
+    if arch in {"resnet50", "teacher_resnet50", "resnet_50"}:
         model = models.resnet50(pretrained=False)
         model.fc = nn.Linear(model.fc.in_features, num_classes)
         return model
 
-    # Pruned model is ResNet50 (from teacher)
-    if "pruned" in name:
-        model = models.resnet50(pretrained=False)
-        model.fc = nn.Linear(model.fc.in_features, num_classes)
-        return model
-
-    # Student and its compressions (distilled, qat) are ResNet18
-    if "resnet18" in name or "student" in name or "distilled" in name or "qat" in name:
+    if arch in {"resnet18", "student_resnet18", "resnet_18"}:
         model = models.resnet18(pretrained=False)
         model.fc = nn.Linear(model.fc.in_features, num_classes)
         return model
 
-    if "resnet50" in name:
-        model = models.resnet50(pretrained=False)
-        model.fc = nn.Linear(model.fc.in_features, num_classes)
-        return model
-
-    if "mobile" in name:
+    if arch in {"mobilenet_v3_small", "mobilenet", "mobile"}:
         model = models.mobilenet_v3_small(pretrained=False)
-        model.classifier[-1] = nn.Linear(model.classifier[-1].in_features, num_classes)
+        if isinstance(model.classifier, nn.Sequential):
+            model.classifier[-1] = nn.Linear(model.classifier[-1].in_features, num_classes)
+        else:
+            model.classifier = nn.Linear(model.classifier.in_features, num_classes)
         return model
 
-    # default student
-    model = models.resnet18(pretrained=False)
-    model.fc = nn.Linear(model.fc.in_features, num_classes)
-    return model
+    raise ValueError(f"Unsupported architecture hint: {arch}")
+
+
+def _guess_arch_from_state_dict(state_dict):
+    sample_key = "layer1.0.conv1.weight"
+    weight = state_dict.get(sample_key)
+    if weight is None:
+        return None
+
+    if weight.ndim == 4:
+        kernel_size = weight.shape[-1]
+        if kernel_size == 3:
+            return "resnet18"
+        if kernel_size == 1:
+            return "resnet50"
+    return None
+
+
+def _architecture_candidates(model_name, state_dict_arch_hint=None):
+    name = (model_name or "").lower()
+    candidates = []
+
+    def add_candidate(arch):
+        if arch and arch not in candidates:
+            candidates.append(arch)
+
+    if "mobile" in name or "mbnet" in name:
+        add_candidate("mobilenet_v3_small")
+
+    if "resnet50" in name or "teacher" in name:
+        add_candidate("resnet50")
+
+    if any(term in name for term in ["resnet18", "student", "distill", "qat"]):
+        add_candidate("resnet18")
+
+    if "pruned" in name:
+        add_candidate("resnet18")
+        add_candidate("resnet50")
+
+    if state_dict_arch_hint:
+        add_candidate(state_dict_arch_hint)
+
+    if not candidates:
+        add_candidate("resnet18")
+
+    return candidates
+
 
 # ================================
 # Robust checkpoint loader
 # ================================
 def load_checkpoint(model_name, ckpt_path, num_classes):
-    model = build_model(model_name, num_classes).to(device)
+    raw_ckpt = torch.load(ckpt_path, map_location=device)
 
-    ckpt = torch.load(ckpt_path, map_location=device)
+    state_dict = raw_ckpt
+    arch_hint = None
 
-    if isinstance(ckpt, dict):
+    if isinstance(raw_ckpt, dict):
+        arch_hint = raw_ckpt.get("arch") or raw_ckpt.get("architecture") or raw_ckpt.get("model_arch")
         for key in ["model_state_dict", "state_dict", "weights"]:
-            if key in ckpt:
-                ckpt = ckpt[key]
+            if key in raw_ckpt and isinstance(raw_ckpt[key], dict):
+                state_dict = raw_ckpt[key]
                 break
 
-    missing, unexpected = model.load_state_dict(ckpt, strict=False)
-    if missing:
-        print("  Missing keys:", missing[:5])
-    if unexpected:
-        print("  Unexpected keys:", unexpected[:5])
+    if not isinstance(state_dict, dict):
+        raise ValueError(f"Checkpoint at {ckpt_path} does not contain a state_dict.")
 
-    return model
+    inferred_from_weights = _guess_arch_from_state_dict(state_dict)
+    candidates = _architecture_candidates(model_name, state_dict_arch_hint=arch_hint)
+    if inferred_from_weights and inferred_from_weights not in candidates:
+        candidates.insert(0, inferred_from_weights)
+
+    load_errors = []
+
+    for arch in candidates:
+        try:
+            model = _build_model_from_arch(arch, num_classes).to(device)
+        except ValueError as arch_err:
+            load_errors.append((arch, str(arch_err)))
+            continue
+
+        try:
+            missing, unexpected = model.load_state_dict(state_dict, strict=False)
+        except RuntimeError as state_err:
+            load_errors.append((arch, str(state_err)))
+            continue
+
+        if missing:
+            print(f"  Missing keys ({len(missing)}): {missing[:5]}")
+        if unexpected:
+            print(f"  Unexpected keys ({len(unexpected)}): {unexpected[:5]}")
+
+        if arch_hint or inferred_from_weights:
+            print(f"  Loaded using inferred architecture: {arch}")
+
+        return model
+
+    error_msg = "; ".join([f"{arch}: {err}" for arch, err in load_errors]) or "No architecture candidates were tested."
+    raise RuntimeError(f"Failed to load checkpoint {ckpt_path} for {model_name}. Details: {error_msg}")
 
 # ================================
 # Evaluation function
@@ -164,15 +227,15 @@ def measure_latency(model, runs=50):
     with torch.no_grad():
         for _ in range(10):
             _ = model(dummy)
-        if device.type == "cuda":
-            torch.cuda.synchronize()
+        if device.type == "mps":
+            torch.mps.synchronize()
 
     start = time.time()
     with torch.no_grad():
         for _ in range(runs):
             _ = model(dummy)
-        if device.type == "cuda":
-            torch.cuda.synchronize()
+        if device.type == "mps":
+            torch.mps.synchronize()
 
     return (time.time() - start) / runs * 1000
 

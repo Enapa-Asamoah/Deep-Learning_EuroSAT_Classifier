@@ -441,50 +441,10 @@ This document provides a practical implementation guide for the LightVision proj
 - Deployment performance report
 - Device-specific recommendations
 
-## Phase 8: Ablation Studies
 
-### 8.1 Ablation Experiments
+## Phase 8: Documentation & Paper Writing
 
-**Objective**: Understand the contribution of each component
-
-**Tasks**:
-- [ ] **Distillation Ablations** (`experiments/ablations/distillation/`)
-  - Temperature scaling effects
-  - Alpha (soft/hard weight) effects
-  - Teacher model size effects
-  - Student architecture effects
-
-- [ ] **Quantization Ablations** (`experiments/ablations/quantization/`)
-  - QAT vs PTQ comparison
-  - Quantization bit-width (8-bit vs 4-bit)
-  - Per-channel vs per-tensor quantization
-  - Calibration dataset size effects
-
-- [ ] **Pruning Ablations** (`experiments/ablations/pruning/`)
-  - Structured vs unstructured comparison
-  - Pruning schedule effects
-  - Recovery training duration
-  - Global vs layer-wise pruning
-
-- [ ] **Combination Ablations** (`experiments/ablations/combined/`)
-  - Order of compression techniques
-  - Interaction effects
-  - Optimal combination identification
-
-**Key Files**:
-- `scripts/ablations/run_distillation_ablations.py`
-- `scripts/ablations/run_quantization_ablations.py`
-- `scripts/ablations/run_pruning_ablations.py`
-- `notebooks/analysis/ablation_analysis.ipynb`
-
-**Deliverables**:
-- Ablation study results
-- Component contribution analysis
-- Hyperparameter sensitivity analysis
-
-## Phase 9: Documentation & Paper Writing
-
-### 9.1 Reproducibility Package
+### 8.1 Reproducibility Package
 
 **Objective**: Ensure complete reproducibility
 

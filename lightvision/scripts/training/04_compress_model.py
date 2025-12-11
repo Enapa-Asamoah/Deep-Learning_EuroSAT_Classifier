@@ -27,7 +27,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 # ================================
 # Device
 # ================================
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('mps' if torch.backends.mps.is_available() else 'cpu')
 
 # ================================
 # Dataset Loader
@@ -93,7 +93,7 @@ def main(args):
     train_loader, val_loader, num_classes = load_dataset(batch_size=args.batch_size)
 
     # Load teacher (if provided)
-    teacher_model = None
+    teacher_model = 'resnet50'
     if args.teacher_checkpoint:
         teacher_model = load_model('teacher', args.teacher_checkpoint, num_classes, device)
         print(f"Loaded teacher checkpoint from {args.teacher_checkpoint}")
@@ -152,9 +152,11 @@ def main(args):
     # ============================================================
     if 'qat' in args.methods:
         print("\n=== Running Quantization-Aware Training (QAT) ===")
+        # QAT is not supported on MPS, use CPU instead
+        qat_device = torch.device('cpu')
         quantized_model, qat_history = train_qat(
             current_model,
-            train_loader, val_loader, device,
+            train_loader, val_loader, qat_device,
             epochs=args.epochs_dict.get('qat', 10),
             lr=args.lr_dict.get('qat', 1e-5),
             save_path=os.path.join(OUTPUT_DIR, 'quantized_model.pth')
